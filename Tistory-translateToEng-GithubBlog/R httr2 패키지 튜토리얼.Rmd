@@ -1,0 +1,151 @@
+---
+title: "R httr2 패키지 튜토리얼"
+author: "동그랑땡"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(httr2)
+```
+
+### httr2 패키지 튜토리얼
+
+Every request starts with a URL:
+
+```{r}
+req <- request(example_url())
+req
+```
+
+Here, instead of an external webstite, we use a test server that’s built-in to httr2 itself. That ensures that this vignette will work regardless of when or where you run it.
+
+We can see exactly what this request will send to the server with a dry run:
+드라이런을 통해 이 요청이 서버로 전송하는 내용을 정확히 확인할 수 있습니다:
+
+```{r}
+req %>% req_dry_run()
+```
+요청의 첫 줄에는 세 가지 중요한 정보가 포함되어 있습니다:
+**GET / HTTP/1.1**
+
+HTTP 메서드는 서버에 수행하고자 하는 작업을 알려주는 동사입니다. 가장 일반적인 동사인 **GET은 리소스를 가져오고 싶다는 것을 나타냅니다.** 다른 동사로는 새 리소스를 생성하는 POST, 기존 리소스를 교체하는 PUT, 리소스를 삭제하는 DELETE 등이 있습니다.
+
+경로: 서버가 이미 알고 있는 세부 정보(예: 프로토콜(http 또는 https), 호스트(로컬 호스트), 포트)가 제거된 URL입니다(R url_parse(example_url())$port).
+
+HTTP 프로토콜의 버전입니다. 이것은 더 낮은 수준에서 처리되기 때문에 우리의 목적에는 중요하지 않습니다.
+
+다음 줄은 :로 구분된 일련의 이름-값 쌍인 HTTP 헤더를 지정합니다. 이 요청의 헤더는 httr2에 의해 자동으로 추가되었지만, 이를 재정의하거나 req_headers()를 사용하여 직접 추가할 수 있습니다:
+
+```{r}
+req %>%
+  req_headers(
+    Name = "Hadley", 
+    `Shoe-Size` = "11", 
+    Accept = "application/json"
+  ) %>% 
+  req_dry_run()
+```
+헤더 이름은 대소문자를 구분하지 않으며 서버는 이해하지 못하는 헤더는 무시합니다.
+
+헤더는 빈 줄로 끝나고 그 뒤에 본문이 이어집니다. 위의 요청(모든 GET 요청과 마찬가지로)에는 본문이 없으므로 본문을 추가하여 어떤 일이 발생하는지 살펴봅시다. req_body_*() 함수는 본문에 데이터를 추가하는 다양한 방법을 제공합니다. 여기서는 req_body_json()을 사용하여 JSON으로 인코딩된 일부 데이터를 추가하겠습니다:
+
+```{r}
+req %>%
+  req_body_json(list(x = 1, y = "a")) %>% 
+  req_dry_run()
+```
+
+무엇이 변경되었나요?
+
+**전송 방법이 GET에서 POST로 변경되었습니다. POST는 웹사이트에 데이터를 전송하는 표준 메서드**이며, 본문을 추가할 때마다 자동으로 사용됩니다. 다른 방법을 사용하려면 req_method()를 사용하세요.
+
+두 개의 새로운 헤더가 있습니다: 콘텐츠 유형과 콘텐츠 길이입니다. 이 헤더는 서버에 본문을 해석하는 방법을 알려주며, JSON으로 인코딩되고 길이는 15바이트입니다.
+
+일부 JSON으로 구성된 본문이 있습니다.
+
+서버마다 다르게 인코딩된 데이터를 원하므로 httr2는 다양한 공통 형식을 제공합니다. 예를 들어 **req_body_form()은 웹 브라우저에서 양식을 제출할 때 사용되는 인코딩**을 사용합니다:
+
+```{r}
+req %>%
+  req_body_form(x = "1", y = "a") %>% 
+  req_dry_run()
+```
+
+그리고 req_body_multipart()는 많은 양의 데이터나 전체 파일을 전송해야 할 때 특히 중요한 멀티파트 인코딩을 사용합니다:
+
+```{r}
+req %>%
+  req_body_multipart(x = "1", y = "a") %>% 
+  req_dry_run()
+```
+
+다른 형식으로 인코딩된 데이터를 보내야 하는 경우 req_body_raw()를 사용하여 본문에 데이터를 추가하고 Content-Type 헤더를 설정할 수 있습니다.
+
+### 요청(Request) 수행 및 응답(Fetch) 가져오기
+
+실제로 요청을 수행하고 서버에서 응답을 다시 가져오려면 req_perform()을 호출합니다:
+
+```{r}
+req <- request(example_url()) %>% req_url_path("/json")
+req
+```
+```{r}
+req %>% req_perform()
+```
+```{r}
+resp <- req %>% req_perform()
+resp
+```
+
+resp_raw()를 사용하여 httr2가 실제로 수신한 시뮬레이션을 볼 수 있습니다:
+
+```{r}
+resp %>% resp_raw()
+```
+
+HTTP 응답은 HTTP 요청과 매우 유사한 구조를 가지고 있습니다. 첫 줄에는 사용된 HTTP 버전과 상태 코드가 표시되며, 선택적으로 간단한 설명이 뒤따릅니다. 그 다음에는 헤더와 빈 줄, 본문이 이어집니다. 대부분의 응답에는 요청과 달리 본문이 있습니다.
+
+resp_() 함수를 사용하여 응답에서 데이터를 추출할 수 있습니다:
+
+resp_status()는 상태 코드를 반환하고 resp_status_desc()는 설명을 반환합니다:
+
+```{r}
+resp %>% resp_status()
+resp %>% resp_status_desc()
+```
+
+resp_headers()로 모든 헤더를 추출하거나 resp_header()로 특정 헤더를 추출할 수 있습니다:
+
+```{r}
+resp %>% resp_headers()
+resp %>% resp_header("Content-Length")
+```
+
+헤더는 대소문자를 구분하지 않습니다:
+
+```{r}
+resp %>% resp_header("ConTEnT-LeNgTH")
+```
+
+resp_body_*() 함수군을 사용하여 다양한 형태로 본문을 추출할 수 있습니다. 이 응답은 JSON을 반환하므로 resp_body_json()을 사용할 수 있습니다:
+
+
+```{r}
+resp %>% resp_body_json() %>% str()
+```
+
+Responses with status codes 4xx and 5xx are HTTP errors. httr2 automatically turns these into R errors:
+
+```{r warning=TRUE}
+request(example_url()) %>% 
+  req_url_path("/status/404") %>% 
+  req_perform()
+```
+```{r warning=TRUE}
+request(example_url()) %>% 
+  req_url_path("/status/500") %>% 
+  req_perform()
+```
+

@@ -1,0 +1,121 @@
+---
+title: "티스토리 블로그 내용 R에서 Api로 끌어오기"
+author: "동그랑땡"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(httr2)
+library(jose)
+```
+
+httr2 패키지를 이용하여 티스토리 api를 사용해보자.
+
+
+### Autentication
+
+```{r}
+clientID='********************************'
+secretKey = '************************************************************************'
+tokenUrl = 'https://www.tistory.com/oauth/access_token'
+
+client1 = oauth_client(
+  clientID,
+  tokenUrl,
+  secret = secretKey,
+  name = 'oooo-tistory-auth'
+  )
+client1
+```
+
+### Authentication code 발급
+
+```{r}
+reqA <- request("https://www.tistory.com") %>%
+  req_oauth_auth_code(
+    client1, 
+    auth_url = "https://www.tistory.com/oauth/authorize",
+    auth_params = list(redirect_uri='https://oooo12.tistory.com',response_type='code') 
+                      # List containing additional parameters passed to 
+                      # oauth_flow_auth_code_url()
+                      #token_params = list(),
+                      # List containing additional parameters passed to the token_url.
+                      #host_name = "localhost")
+                      # Host name used to generate redirect_uri
+)
+reqA %>% req_perform()
+```
+
+```{r}
+authUrl = 'https://www.tistory.com/oauth/authorize'
+
+oauth_flow_auth_code(
+  client1, 
+  auth_url = authUrl,
+  auth_params=list(redirect_uri='https://oooo12.tistory.com',response_type='code')
+)
+```  
+
+### 코드은 주소창에서 복사
+
+https://oooo12.tistory.com/?code=************************************************************************&state=tF5xDoqgSV_Iz1UkOdHG5cmkXxXa_P5OkcI-d7q1BLo
+
+```{r}
+code1 = '************************************************************************'
+```
+
+### 토큰 발행
+
+토큰발행은 request로만 가능하다. 
+
+토큰을 발행하려면 아래 주소의 서버로 요청하는 경우에만 토큰을 발급한다고 티스토리 api가 정했기 때문에, 브라우저로는 토큰을 받을 수 없다.
+
+
+
+```{r}
+reqToken = request(
+  paste0('https://www.tistory.com/oauth/access_token?client_id=',
+         clientID,
+         '&client_secret=',secretKey,
+         '&redirect_uri=https://oooo12.tistory.com',
+         '&code=',code1,
+         '&grant_type=authorization_code')
+)
+reqToken
+```
+```{r}
+resp <- reqToken %>% req_perform()
+resp
+```
+
+```{r}
+resp %>% resp_raw()
+```
+
+```{r}
+token1 = '*****************************************************************'
+```
+
+
+```{r}
+req2 <- request(url) %>% req_url_path_append("apis") %>% req_url_path_append('post') %>% req_url_path_append('read') %>% req_url_query(access_token=token1,blogName='oooo12',postId='2')
+req2
+```
+```{r}
+resp2 <- req2 %>% req_perform()
+```
+```{html}
+<tistory>
+<status>403</status>
+<error_message>이 블로그는 내부 정책으로 OPEN API 사용할 수 없습니다.</error_message>
+</tistory>
+```
+![](https://i.ibb.co/ZNZc4fv/Screenshot-2023-10-26-at-5-51-00-PM.png) 
+이 블로그는 내부 정책으로 OPEN API 사용할 수 없습니다. 오류 참고: https://kamilake.com/410
+
+```{r}
+resp %>% resp_raw()
+```
