@@ -6,4 +6,5 @@ hideString = function(string){
   print(repStar)
 }
 
+#적용
 hideString('8575420e51135469ef68b37d1bdc4634_56039822660c5e01acbce811a10d4f28')
