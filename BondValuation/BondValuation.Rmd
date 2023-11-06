@@ -1,0 +1,152 @@
+---
+title: "Bond Valuation"
+author: "동그랑땡 oooo12"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: True
+    float_toc: True
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+2023년 초 채권 열풍과 함께 높은 수익률의 채권을 구매한 A씨.
+
+만기까지 들고 있을 작정으로 구매했지만, 세상은 원하는 대로 흘러가지 않는다.
+
+2026년 7월 만기인 채권을 2023년 11월에 팔려면 얼마에 팔아야할지 고민하고 있는데...
+
+보유하고 있는 채권의 기본 정보
+
+한국전력공사채권 1054\
+종류 : 고정, 이표채\
+표면금리: 1.943%\
+이자지급주기 : 6개월\
+발행일 : 2021-07-12\
+만기 : 2026-07-12\
+직전 이표일 : 2023-07-12\
+차기 이표일 : 2023-01-12
+
+확인할 수 있는 채권의 수익률, 가격
+(2023-11-07기준)
+현재가 9423원\
+유통수익률: 4.4%
+
+현재 호가(2023.11.6) 9,850원 판매 호가 존재
+
+## install BondValuation Package
+
+R에는 다행히 채권 수익률이나 가격을 결정할 수 있는 패키지가 존재한다.
+
+BondValuation 패키지를 이용해보자.  
+[BondValuation Cran](https://cran.r-project.org/web/packages/BondValuation/index.html)
+
+```{r install BondValuation Package, eval=FALSE}
+install.packages('BondValuation')
+```
+
+```{r library}
+library(BondValuation)
+```
+
+---
+
+먼저 현재 호가창에 있는 판매가 9850원은 수익률이 어떻게 책정되어 있는지 확인하고 싶다.
+
+BondVal.Yield 함수를 활용해보자.
+
+## BondVal.Yield
+### argument
+
+CP = Clean Price = Dirty Price - Accured Interest
+
+Dirty Price(=Invoice Price) = Accured Interest를 포함한 채권가격
+
+Accrued Interest는 미지급이자(경과이자)다.
+
+예를 들어 매년 6월 30일, 12월 31일, 6개월에 한번 60원을 지급하는 채권이 있다.
+
+만약 이 채권을 7월 1일에 판다면 미지급이자(Accrued interest)는 없다. 6월 30일에 받을 이자 다 받았기 때문이다. 
+
+그러나 8월 1일에 판다면, 이자를 받을 수 있는 기간이 한 달 줄었지만 아무런 이자도 받지 못했다. 사실 10원(한달치 이자 = 60원/6개월)을 날린 셈이다.
+
+때문에 대부분 채권을 팔 때 미지급이자까지 가격에 넣어서 판매한다.
+
+Dirty Price는 Accrued Interest가 포함된 가격, Clean Price는 Accrued Interest를 뺀 가격이다.
+
+간단하게 하기 위해 현재 호가를 Clean Price라 가정했다.
+
+미국 채권 기본 가격은 100달러이고, 한국 채권 기본 가격은 1만원이다. 한국 채권가격을 미국 채권 가격에 맞게 변환했다.(예: 한국 채권가격이 9850원이면, 100*9850/10000)
+
+SETT = settlement date, 채권이 실제로 거래되는 날짜
+Em = The bond’s issue date. 채권 발행일
+Mat = maturity date 채권만기일
+CpY = 연간 이자 지급 횟수 default:2
+Coup = Nominal interest rate per year in percent. 표면 금리
+DCC = day count convention 미국에선 보통 30/360을 사용한다. 즉 1년은 360일, 1달은 30일로 하고 Accrued Interest를 계산할 때 사용할 남은 날짜를 계산한다.
+BondValuation Package에서는 9번을 사용하면 된다.
+
+DateOrigin = Determines the starting point for the daycount in "Date" objects. Default: "1970-01-01"
+
+Date origin이 1970-01-01로 설정된 이유는 R에서 지원하는 date type의 기준점이 1970-01-01이기 때문이다. 자세한 내용은 '손에 잡히는 R프로그래밍'에서 확인할 수 있다.
+
+### YTM(수익률) 계산
+
+다시 호가창으로 돌아가서 9,850원 판매 호가가 제시하는 수익률을 계산해보자.
+
+```{r}
+BondVal.Yield(CP=100*9850/10000, SETT = '2023-11-08', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
+```
+
+ytm.p.a가 연간 수익률을 나타낸다.
+
+2.52%로 말도 안되는 호가를 내었다는 것을 확인할 수 있다.
+
+---
+
+## BondVal.Price
+
+```{r}
+BondPrice = BondVal.Price(YtM = 4.4 , SETT = '2023-11-07', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
+BondPrice
+KbondPrice=BondPrice$DP*100
+paste("채권가격은",KbondPrice)
+```
+
+계산에 의한 채권가격은 9446.91816426338이다.
+
+증권사에서 안내하고 있는 가격과 계산한 Dirty Price에는 약간의 갭이 있다.  
+증권사에서 안내하고 있는 가격이 20원 정도 낮은데(0.253%), 이는 채권 매도비용 때문에 발생한 차이로 추정한다.(수수료, 세금 등) 
+
+#### <증권사 안내 가격>
+(2023-11-07기준)
+현재가 9423원\
+유통수익률: 4.4%
+
+남은 기간(duration) 약 2.5년
+
+국고채 2.5년이면 수익률은 3.87% 수준으로 잡을 수 있다.
+
+어느정도 리스크 프리미엄을 주면 될까? 
+
+한달전 국고채 2년,3년물이 4%였다.
+9월에 발행한 한전채 2년이 4.335%, 3년이 4.4%이다.
+약 0.3 ~ 0.4%의 리스크 프리미엄을 준 것이다.
+
+그렇다면, 지금 갖고있는 채권은 4.3%의 수익률로 팔더라도 흥미를 느낄 것이라 본다.
+
+```{r}
+BondPrice = BondVal.Price(YtM = 4.3 , SETT = '2023-11-07', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
+BondPrice
+KbondPrice=BondPrice$DP*100
+paste("채권가격은",KbondPrice)
+```
+
+
+
+
+
+
+
