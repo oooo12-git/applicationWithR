@@ -10,6 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(BondValuation)
 ```
 
 2023년 초 채권 열풍과 함께 높은 수익률의 채권을 구매한 A씨.
@@ -97,7 +98,7 @@ Date origin이 1970-01-01로 설정된 이유는 R에서 지원하는 date type�
 다시 호가창으로 돌아가서 9,850원 판매 호가가 제시하는 수익률을 계산해보자.
 
 ```{r}
-BondVal.Yield(CP=100*9850/10000, SETT = '2023-11-08', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
+BondVal.Yield(CP=100*9850/10000, SETT = '2023-11-09', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
 ```
 
 ytm.p.a가 연간 수익률을 나타낸다.
@@ -138,7 +139,7 @@ paste("채권가격은",KbondPrice)
 그렇다면, 지금 갖고있는 채권은 4.3%의 수익률로 팔더라도 흥미를 느낄 것이라 본다.
 
 ```{r}
-BondPrice = BondVal.Price(YtM = 4.3 , SETT = '2023-11-07', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
+BondPrice = BondVal.Price(YtM = 4.3 , SETT = '2023-11-08', Em = '2021-07-12', Mat = '2026-07-12', CpY = 2, Coup = 1.943, DCC=9)
 BondPrice
 KbondPrice=BondPrice$DP*100
 paste("채권가격은",KbondPrice)
