@@ -1,0 +1,90 @@
+---
+title: "for Bodeplot - 0.1 - 위상차 Phase"
+format: html
+---
+
+```{r}
+#| label: 데이터 수집
+#| echo: false
+df = read.csv('./data/0.1.lvm',sep = "\t",header = F)
+df
+```
+
+```{r}
+#| label: (비어있는) 1열 제거, 1~100행(초기 필요없는 데이터) 제거
+#| echo: false
+
+df = df[,2:4] 
+df = df[-(1:100),]
+df
+```
+
+```{r}
+#| label: 열 이름 넣어주기
+colnames(df) <- c("sec","u","theta")
+head(df)
+```
+
+```{r}
+#| label: plotting for EDA
+#| code-fold: true
+plot(df[,1],df[,2],col = 'red',xlim = c(450,490), ylim = c(-1500,200))
+par(new = T)
+plot(df[,1],df[,3], col = 'blue',xlim = c(450,490), ylim = c(-1500,200))
+```
+
+```{r}
+#| label: time 열 0부터 시작하도록 조정
+
+df[,1]=df[,1]-min(df[,1])
+```
+```{r}
+#| label: time 열 check
+
+head(df)
+```
+
+```{r}
+#| label: plotting for EDA - 2
+#| code-fold: true
+plot(df[,1],df[,2],col = 'red',xlim = c(0,50), ylim = c(-1500,200),xlab = "sec",ylab = "location")
+par(new = T)
+plot(df[,1],df[,3], col = 'blue',xlim = c(0,50), ylim = c(-1500,200),xlab = "",ylab = "")
+legend("topright",legend=c("u","theta"),fill=c("red","blue"),cex=1.5)
+```
+
+
+```{r}
+#| label: 구간별 최저값의 시간차를 이용하여 위상차 구하기 - 1 데이터 나누기
+
+df_10 = df[df$sec >= 0 & df$sec <= 10, ] # 0 ~ 10초 구간 데이터 얻기
+df_20 = df[df$sec >= 10 & df$sec <= 20, ] # 10 ~ 20초 구간 데이터 얻기
+df_30 = df[df$sec >= 20 & df$sec <= 30, ] # 20 ~ 30초 구간 데이터 얻기
+df_40 = df[df$sec >= 30 & df$sec <= 40, ] # 30 ~ 40초 구간 데이터 얻기
+df_50 = df[df$sec >= 40 & df$sec <= 50, ] # 40 ~ 50초 구간 데이터 얻기
+```
+
+```{r}
+#| label: calculate radian frequency 
+
+# frequency = 1Hz = 2*pi rad/s
+# 실험 주파수 = 0.1Hz
+
+freq = 2*pi*0.1
+
+```
+
+```{r}
+#| label: 구간별 최저값의 시간차를 이용하여 위상차 구하기 - 2 계산
+
+ph_10 = (df_10[which.min(df_10[,3]),1] - df_10[which.min(df_10[,2]),1]) * freq
+ph_20 = (df_20[which.min(df_20[,3]),1] - df_20[which.min(df_20[,2]),1]) * freq
+ph_30 = (df_30[which.min(df_30[,3]),1] - df_30[which.min(df_30[,2]),1]) * freq
+ph_40 = (df_40[which.min(df_40[,3]),1] - df_40[which.min(df_40[,2]),1]) * freq
+ph_50 = (df_50[which.min(df_50[,3]),1] - df_50[which.min(df_50[,2]),1]) * freq
+
+ph_m = mean(ph_10,ph_20,ph_30,ph_40,ph_50)
+ph_m
+```
+
+

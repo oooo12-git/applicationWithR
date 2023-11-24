@@ -1,0 +1,164 @@
+---
+title: "for Bodeplot - 위상차 Phase"
+format: html
+---
+
+```{r}
+PHASEforBodePlot3 = function(freqHz){
+  
+  # 데이터 불러오기
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  
+  # 데이터 가공
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:1020),] # 1~1000행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  
+  fr1 = 0 + 1/freqHz
+  fr2 = 0 + 1/freqHz * 2
+  fr3 = 0 + 1/freqHz * 3
+  fr4 = 0 + 1/freqHz * 4
+  
+  # 데이터 나누기
+  df_fr1 = df[df$sec >= 0 & df$sec <= fr1, ] # 0 ~ fr1초 구간 데이터 얻기
+  df_fr2 = df[df$sec >= fr1 & df$sec <= fr2, ] # fr1 ~ fr2초 구간 데이터 얻기
+  df_fr3 = df[df$sec >= fr2 & df$sec <= fr3, ] # fr2 ~ fr3초 구간 데이터 얻기
+  df_fr4 = df[df$sec >= fr3 & df$sec <= fr4, ] # fr3 ~ fr4초 구간 데이터 얻기
+  
+  # calculate radian frequency 
+  freq = 2*pi*freqHz
+
+  ph_fr1 = (df_fr1[which.min(df_fr1[,3]),1] - df_fr1[which.min(df_fr1[,2]),1]) * freq
+  ph_fr2 = (df_fr2[which.min(df_fr2[,3]),1] - df_fr2[which.min(df_fr2[,2]),1]) * freq
+  ph_fr3 = (df_fr3[which.min(df_fr3[,3]),1] - df_fr3[which.min(df_fr3[,2]),1]) * freq
+  ph_fr4 = (df_fr4[which.min(df_fr4[,3]),1] - df_fr4[which.min(df_fr4[,2]),1]) * freq
+
+  ph_m = mean(ph_fr1,ph_fr2,ph_fr3,ph_fr4)
+  print(paste0("위상차 = ",ph_m," rad, radian frequency = ",freq))
+}
+
+```
+
+```{r}
+PHASEforBodePlot = function(freqHz){
+  
+  # 데이터 불러오기
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  
+  # 데이터 가공
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:100),] # 1~100행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  
+  fr1 = 0 + 1/freqHz
+  fr2 = 0 + 1/freqHz * 2
+  fr3 = 0 + 1/freqHz * 3
+  fr4 = 0 + 1/freqHz * 4
+  
+  # 데이터 나누기
+  df_fr1 = df[df$sec >= 0 & df$sec <= fr1, ] # 0 ~ fr1초 구간 데이터 얻기
+  df_fr2 = df[df$sec >= fr1 & df$sec <= fr2, ] # fr1 ~ fr2초 구간 데이터 얻기
+  df_fr3 = df[df$sec >= fr2 & df$sec <= fr3, ] # fr2 ~ fr3초 구간 데이터 얻기
+  df_fr4 = df[df$sec >= fr3 & df$sec <= fr4, ] # fr3 ~ fr4초 구간 데이터 얻기
+  
+  # calculate radian frequency 
+  freq = 2*pi*freqHz
+
+  ph_fr1 = (df_fr1[which.min(df_fr1[,3]),1] - df_fr1[which.min(df_fr1[,2]),1]) * freq
+  ph_fr2 = (df_fr2[which.min(df_fr2[,3]),1] - df_fr2[which.min(df_fr2[,2]),1]) * freq
+  ph_fr3 = (df_fr3[which.min(df_fr3[,3]),1] - df_fr3[which.min(df_fr3[,2]),1]) * freq
+  ph_fr4 = (df_fr4[which.min(df_fr4[,3]),1] - df_fr4[which.min(df_fr4[,2]),1]) * freq
+
+  ph_m = mean(ph_fr1,ph_fr2,ph_fr3,ph_fr4)
+  print(paste0("위상차 = ",ph_m," rad, radian frequency = ",freq))
+}
+
+```
+
+```{r}
+PHASEforBodePlot3(0.1)
+```
+
+```{r}
+PHASEforBodePlot3(0.2)
+```
+
+```{r}
+PHASEforBodePlot3(0.3)
+```
+
+```{r}
+PHASEforBodePlot3(0.4)
+```
+
+```{r}
+PHASEforBodePlot3(0.5)
+```
+
+```{r}
+PHASEforBodePlot3(0.6)
+```
+
+```{r}
+PHASEforBodePlot3(0.7)
+```
+
+```{r}
+PHASEforBodePlot(0.8)
+```
+
+```{r}
+PHASEforBodePlot3(0.9)
+```
+```{r}
+PHASEforBodePlot3(1)
+```
+```{r}
+PHASEforBodePlot3(2)
+```
+```{r}
+PHASEforBodePlot3(3)
+```
+
+```{r}
+PHASEforBodePlot3(4)
+```
+
+```{r}
+PHASEforBodePlot3(5)
+```
+
+```{r}
+PHASEforBodePlot3(6)
+```
+
+```{r}
+PHASEforBodePlot3(7)
+```
+
+```{r}
+PHASEforBodePlot3(8)
+```
+
+```{r}
+PHASEforBodePlot3(9)
+```
+
+```{r}
+PHASEforBodePlot3(10)
+```
+
+```{r}
+#| label: freq(rad/s) - phase Graph - 1 데이터불러오기
+data1 = read.table(pipe("pbpaste"), sep="\t", h=T) # 2023/11/10 sep="\t" 추가
+```
+```{r}
+#| label: freq(rad/s) - magnitude Graph - 2 그래프 그리기
+
+ggplot(data1, aes(freq,phaseDegree)) + geom_point() + geom_smooth()
+```
+

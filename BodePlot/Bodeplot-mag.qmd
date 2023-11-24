@@ -1,0 +1,448 @@
+---
+title: "for Bodeplot - 진폭 Magnitude"
+format: html
+---
+
+```{r}
+#| label: EDAforBodePlot 사용자 정의함수 만들기
+#| code-fold: true
+
+EDAforBodePlot = function(freqHz){
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:100),] # 1~100행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  plot(df[,1],df[,2],col = 'red',xlab = "sec",ylab = "location",main=paste0("u, ",freqHz,"Hz, ",freqHz*2*pi,"rad/s"))
+  grid()
+  par(mfrow = c(1,2))
+  plot(df[,1],df[,3], col = 'blue',xlab = "sec",ylab = "location", main
+       = paste0("theta, ",freqHz,"Hz, ",freqHz*2*pi,"rad/s"))
+  grid()
+}
+```
+
+```{r}
+#| label: 0.1Hz EDAforBodePlot
+EDAforBodePlot(0.1)
+```
+
+```{r}
+#| label: MAGforBodePlot 사용자 정의함수 만들기
+#| code-fold: true
+
+MAGforBodePlot = function(freqHz,fr1,fr2,fr3,fr4){
+  # 데이터 불러오기
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  
+  # 데이터 가공
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:100),] # 1~100행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  
+  # 데이터 나누기
+  df_fr1 = df[df$sec >= 0 & df$sec <= fr1, ] # 0 ~ fr1초 구간 데이터 얻기
+  df_fr2 = df[df$sec >= fr1 & df$sec <= fr2, ] # fr1 ~ fr2초 구간 데이터 얻기
+  df_fr3 = df[df$sec >= fr2 & df$sec <= fr3, ] # fr2 ~ fr3초 구간 데이터 얻기
+  df_fr4 = df[df$sec >= fr3 & df$sec <= fr4, ] # fr3 ~ fr4초 구간 데이터 얻기
+  
+  #진폭 구하기
+  A_fr1 = max(df_fr1$u)-min(df_fr1$u) # input의 진폭
+  Aa_fr1= max(df_fr1$theta)-min(df_fr1$theta) # output의 진폭
+
+  A_fr2 = max(df_fr2$u)-min(df_fr2$u) # input의 진폭
+  Aa_fr2= max(df_fr2$theta)-min(df_fr2$theta) # output의 진폭
+
+  A_fr3 = max(df_fr3$u)-min(df_fr3$u) # input의 진폭
+  Aa_fr3= max(df_fr3$theta)-min(df_fr3$theta) # output의 진폭
+
+  A_fr4 = max(df_fr4$u)-min(df_fr4$u) # input의 진폭
+  Aa_fr4= max(df_fr4$theta)-min(df_fr4$theta) # output의 진폭
+  
+  # 각 진폭의 평균 계산
+  A_m=mean(A_fr1,A_fr2,A_fr3,A_fr4)
+  Aa_m=mean(Aa_fr1,Aa_fr2,Aa_fr3,Aa_fr4)
+
+  # 진폭비 계산
+  Mag = Aa_m/A_m
+  print(paste0("Magnitude = ",Mag,", radian frequency = ",freqHz*2*pi," rad/s"))
+}
+```
+
+```{r}
+#| label: 0.1Hz MAGforBodePlot
+
+MAGforBodePlot(0.1,fr1 = 10,fr2 =20,fr3 =30,fr4 =40)
+```
+
+```{r}
+#| label: 0.2Hz EDAforBodePlot
+
+EDAforBodePlot(0.2)
+```
+
+```{r}
+#| label: 0.2Hz MAGforBodePlot
+
+MAGforBodePlot(0.2,fr1 = 5,fr2 = 10,fr3 =15,fr4 =20)
+```
+
+```{r}
+#| label: 0.3Hz EDAforBodePlot
+
+EDAforBodePlot(0.3)
+```
+
+```{r}
+#| label: 0.3Hz MAGforBodePlot
+
+MAGforBodePlot(0.3,fr1 = 2.5,fr2 =5,fr3 =7.5,fr4 =10)
+```
+
+```{r}
+#| label: 0.4Hz EDAforBodePlot
+
+EDAforBodePlot(0.4)
+```
+
+```{r}
+#| label: 0.4Hz MAGforBodePlot
+
+MAGforBodePlot(0.4,fr1 = 2.5,fr2 =5,fr3 =7.5,fr4 =10)
+```
+
+```{r}
+#| label: 0.5Hz EDAforBodePlot
+
+EDAforBodePlot(0.5)
+```
+
+```{r}
+#| label: 0.5Hz MAGforBodePlot
+
+MAGforBodePlot(0.5,fr1 = 2.5,fr2 =5,fr3 =7.5,fr4 =10)
+```
+
+```{r}
+#| label: 0.6Hz EDAforBodePlot
+
+EDAforBodePlot(0.6)
+```
+
+```{r}
+#| label: 0.6Hz MAGforBodePlot
+
+MAGforBodePlot(0.6,fr1 = 2.5,fr2 =5,fr3 =7.5,fr4 =10)
+```
+
+```{r}
+#| label: 0.7Hz EDAforBodePlot
+
+EDAforBodePlot(0.7)
+```
+
+```{r}
+#| label: 0.7Hz MAGforBodePlot
+
+MAGforBodePlot(0.7,fr1 = 2,fr2 =4,fr3 = 6,fr4 =8)
+```
+
+```{r}
+#| label: 0.8Hz EDAforBodePlot
+
+EDAforBodePlot(0.8)
+```
+
+```{r}
+#| label: 0.8Hz MAGforBodePlot
+
+MAGforBodePlot(0.8,fr1 = 2,fr2 = 4,fr3 = 6,fr4 = 8)
+```
+
+```{r}
+#| label: 0.9Hz EDAforBodePlot
+
+EDAforBodePlot(0.9)
+```
+
+```{r}
+#| label: 0.9Hz MAGforBodePlot
+
+MAGforBodePlot(0.9,fr1 = 2,fr2 =4,fr3 =6,fr4 =8)
+```
+
+```{r}
+#| label: 1Hz EDAforBodePlot
+
+EDAforBodePlot(1)
+```
+
+
+```{r}
+#| label: 1Hz MAGforBodePlot
+
+MAGforBodePlot(1,fr1 = 1,fr2 =2,fr3 = 3,fr4 = 4)
+```
+
+```{r}
+#| label: 2Hz EDAforBodePlot
+
+EDAforBodePlot(2)
+```
+
+
+```{r}
+#| label: 2Hz MAGforBodePlot
+
+MAGforBodePlot(2,fr1 = 1,fr2 =2,fr3 =3,fr4 =4)
+```
+
+
+```{r}
+#| label: 3Hz EDAforBodePlot
+
+EDAforBodePlot(3)
+```
+
+```{r}
+#| label: 3Hz MAGforBodePlot
+
+MAGforBodePlot(3,fr1 = 1,fr2 =2,fr3 =3,fr4 =4)
+```
+
+
+```{r}
+#| label: EDAforBodePlot2 사용자 정의함수 만들기
+#| code-fold: true
+
+EDAforBodePlot2 = function(freqHz){
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:10000),] # 1~10000행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  plot(df[,1],df[,2],col = 'red',xlab = "sec",ylab = "location",main="u")
+  grid()
+  par(mfrow = c(1,2))
+  plot(df[,1],df[,3], col = 'blue',xlab = "sec",ylab = "location", main
+       ="theta")
+  grid()
+}
+```
+
+```{r}
+#| label: MAGforBodePlot2 사용자 정의함수 만들기
+#| code-fold: true
+
+MAGforBodePlot2 = function(freqHz,fr1,fr2,fr3,fr4){
+  # 데이터 불러오기
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  
+  # 데이터 가공
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:10000),] # 1~10000행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  
+  # 데이터 나누기
+  df_fr1 = df[df$sec >= 0 & df$sec <= fr1, ] # 0 ~ fr1초 구간 데이터 얻기
+  df_fr2 = df[df$sec >= fr1 & df$sec <= fr2, ] # fr1 ~ fr2초 구간 데이터 얻기
+  df_fr3 = df[df$sec >= fr2 & df$sec <= fr3, ] # fr2 ~ fr3초 구간 데이터 얻기
+  df_fr4 = df[df$sec >= fr3 & df$sec <= fr4, ] # fr3 ~ fr4초 구간 데이터 얻기
+  
+  #진폭 구하기
+  A_fr1 = max(df_fr1$u)-min(df_fr1$u) # input의 진폭
+  Aa_fr1= max(df_fr1$theta)-min(df_fr1$theta) # output의 진폭
+
+  A_fr2 = max(df_fr2$u)-min(df_fr2$u) # input의 진폭
+  Aa_fr2= max(df_fr2$theta)-min(df_fr2$theta) # output의 진폭
+
+  A_fr3 = max(df_fr3$u)-min(df_fr3$u) # input의 진폭
+  Aa_fr3= max(df_fr3$theta)-min(df_fr3$theta) # output의 진폭
+
+  A_fr4 = max(df_fr4$u)-min(df_fr4$u) # input의 진폭
+  Aa_fr4= max(df_fr4$theta)-min(df_fr4$theta) # output의 진폭
+  
+  # 각 진폭의 평균 계산
+  A_m=mean(A_fr1,A_fr2,A_fr3,A_fr4)
+  Aa_m=mean(Aa_fr1,Aa_fr2,Aa_fr3,Aa_fr4)
+
+  # 진폭비 계산
+  Mag = Aa_m/A_m
+  print(paste0("Magnitude = ",Mag,", radian frequency = ",freqHz*2*pi," rad/s"))}
+```
+
+```{r}
+#| label: EDAforBodePlot3 사용자 정의함수 만들기
+#| code-fold: true
+
+EDAforBodePlot3 = function(freqHz){
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:1000),] # 1~10000행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  plot(df[,1],df[,2],col = 'red',xlab = "sec",ylab = "location",main="u")
+  grid()
+  par(mfrow = c(1,2))
+  plot(df[,1],df[,3], col = 'blue',xlab = "sec",ylab = "location", main
+       ="theta")
+  grid()
+}
+```
+
+```{r}
+#| label: MAGforBodePlot3 사용자 정의함수 만들기
+#| code-fold: true
+
+MAGforBodePlot3 = function(freqHz,fr1,fr2,fr3,fr4){
+  # 데이터 불러오기
+  setwd("/Users/jaahyun/Documents/applicationWithR/BodePlot")
+  df = read.csv(paste0('./data/',freqHz,'.lvm'),sep = "\t",header = F)
+  
+  # 데이터 가공
+  df = df[,2:4] # (비어있는) 1열 제거 
+  df = df[-(1:1000),] # 1~10000행(초기 필요없는 데이터) 제거
+  colnames(df) <- c("sec","u","theta") # 열 이름 넣어주기
+  df[,1]=df[,1]-min(df[,1]) #time 열 0부터 시작하도록 조정
+  
+  # 데이터 나누기
+  df_fr1 = df[df$sec >= 0 & df$sec <= fr1, ] # 0 ~ fr1초 구간 데이터 얻기
+  df_fr2 = df[df$sec >= fr1 & df$sec <= fr2, ] # fr1 ~ fr2초 구간 데이터 얻기
+  df_fr3 = df[df$sec >= fr2 & df$sec <= fr3, ] # fr2 ~ fr3초 구간 데이터 얻기
+  df_fr4 = df[df$sec >= fr3 & df$sec <= fr4, ] # fr3 ~ fr4초 구간 데이터 얻기
+  
+  #진폭 구하기
+  A_fr1 = max(df_fr1$u)-min(df_fr1$u) # input의 진폭
+  Aa_fr1= max(df_fr1$theta)-min(df_fr1$theta) # output의 진폭
+
+  A_fr2 = max(df_fr2$u)-min(df_fr2$u) # input의 진폭
+  Aa_fr2= max(df_fr2$theta)-min(df_fr2$theta) # output의 진폭
+
+  A_fr3 = max(df_fr3$u)-min(df_fr3$u) # input의 진폭
+  Aa_fr3= max(df_fr3$theta)-min(df_fr3$theta) # output의 진폭
+
+  A_fr4 = max(df_fr4$u)-min(df_fr4$u) # input의 진폭
+  Aa_fr4= max(df_fr4$theta)-min(df_fr4$theta) # output의 진폭
+  
+  # 각 진폭의 평균 계산
+  A_m=mean(A_fr1,A_fr2,A_fr3,A_fr4)
+  Aa_m=mean(Aa_fr1,Aa_fr2,Aa_fr3,Aa_fr4)
+
+  # 진폭비 계산
+  Mag = Aa_m/A_m
+  print(paste0("Magnitude = ",Mag,", radian frequency = ",freqHz*2*pi," rad/s"))}
+```
+
+```{r}
+#| label: 4Hz EDAforBodePlot3
+
+EDAforBodePlot2(4)
+```
+
+
+```{r}
+#| label: 4Hz MAGforBodePlot2
+
+MAGforBodePlot2(4,fr1 = 2.5,fr2 =5,fr3 =7.5,fr4 =10)
+```
+
+```{r}
+#| label: 5Hz EDAforBodePlot3
+
+EDAforBodePlot(5)
+```
+
+```{r}
+#| label: 5Hz MAGforBodePlot
+
+MAGforBodePlot(5,fr1 = 1,fr2 =2,fr3 =3,fr4 =4)
+```
+
+
+```{r}
+#| label: 6Hz EDAforBodePlot3
+
+EDAforBodePlot3(6)
+```
+
+```{r}
+#| label: 6Hz MAGforBodePlot3
+
+MAGforBodePlot3(6,fr1 = 1,fr2 =2,fr3 =3,fr4 =4)
+```
+
+```{r}
+#| label: 7Hz EDAforBodePlot3
+
+EDAforBodePlot3(7)
+```
+
+```{r}
+#| label: 7Hz MAGforBodePlot3
+
+MAGforBodePlot3(7,fr1 = 0.2,fr2 =0.4,fr3 =0.6,fr4 =0.8)
+```
+
+```{r}
+#| label: 8Hz EDAforBodePlot3
+
+EDAforBodePlot3(8)
+```
+
+```{r}
+#| label: 8Hz MAGforBodePlot3
+
+MAGforBodePlot3(8,fr1 = 0.2,fr2 =0.4,fr3 =0.6,fr4 =0.8)
+```
+
+```{r}
+#| label: 9Hz EDAforBodePlot3
+
+EDAforBodePlot3(9)
+```
+
+```{r}
+#| label: 9Hz MAGforBodePlot3
+
+MAGforBodePlot3(9,fr1 = 0.2,fr2 =0.4,fr3 =0.6,fr4 =0.8)
+```
+
+```{r}
+#| label: 10Hz EDAforBodePlot3
+
+EDAforBodePlot3(10)
+```
+
+```{r}
+#| label: 10Hz MAGforBodePlot3
+
+MAGforBodePlot3(10,fr1 = 0.1,fr2 =0.2,fr3 = 0.3,fr4 = 0.4)
+```
+
+
+```{r}
+#| label: freq(rad/s) - magnitude Graph - 1 데이터불러오기
+data1 = read.table(pipe("pbpaste"), sep="\t", h=T) # 2023/11/10 sep="\t" 추가
+```
+
+```{r}
+#| label: 라이브러리 불러오기
+#| code-fold: true
+#| echo: false
+
+library(tidyverse)
+```
+
+```{r}
+#| label: freq(rad/s) - magnitude Graph - 2 그래프 그리기
+
+ggplot(data1, aes(freq,X20logmag)) + geom_point() + geom_smooth()
+```
+

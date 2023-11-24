@@ -1,0 +1,11 @@
+---
+title: "Bodeplot"
+format: html
+---
+```{r}
+#| echo: false
+getwd()
+```
+
+![](./images/freq-mag20log.png)
+![](./images/freq-phase.png)
