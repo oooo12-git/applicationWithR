@@ -443,6 +443,6 @@ library(tidyverse)
 ```{r}
 #| label: freq(rad/s) - magnitude Graph - 2 그래프 그리기
 
-ggplot(data1, aes(freq,X20logmag)) + geom_point() + geom_smooth()
+ggplot(data1, aes(freq,Invmag20log)) + geom_point() + geom_smooth() + scale_x_log10(breaks = c(0.1, 1, 10, 100), labels = c("0.1","1", "10", "100")) + ylab("Magnitude(dB)") + xlab("Frequency(rad/s)")
 ```
 
