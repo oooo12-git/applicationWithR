@@ -30,10 +30,10 @@ PHASEforBodePlot3 = function(freqHz){
   # calculate radian frequency 
   freq = 2*pi*freqHz
 
-  ph_fr1 = (df_fr1[which.min(df_fr1[,3]),1] - df_fr1[which.min(df_fr1[,2]),1]) * freq
-  ph_fr2 = (df_fr2[which.min(df_fr2[,3]),1] - df_fr2[which.min(df_fr2[,2]),1]) * freq
-  ph_fr3 = (df_fr3[which.min(df_fr3[,3]),1] - df_fr3[which.min(df_fr3[,2]),1]) * freq
-  ph_fr4 = (df_fr4[which.min(df_fr4[,3]),1] - df_fr4[which.min(df_fr4[,2]),1]) * freq
+  ph_fr1 = (df_fr1[which.min(df_fr1[,2]),1] - df_fr1[which.min(df_fr1[,3]),1]) * freq
+  ph_fr2 = (df_fr2[which.min(df_fr2[,2]),1] - df_fr2[which.min(df_fr2[,3]),1]) * freq
+  ph_fr3 = (df_fr3[which.min(df_fr3[,2]),1] - df_fr3[which.min(df_fr3[,3]),1]) * freq
+  ph_fr4 = (df_fr4[which.min(df_fr4[,2]),1] - df_fr4[which.min(df_fr4[,3]),1]) * freq
 
   ph_m = mean(ph_fr1,ph_fr2,ph_fr3,ph_fr4)
   print(paste0("위상차 = ",ph_m," rad, radian frequency = ",freq))
@@ -68,10 +68,10 @@ PHASEforBodePlot = function(freqHz){
   # calculate radian frequency 
   freq = 2*pi*freqHz
 
-  ph_fr1 = (df_fr1[which.min(df_fr1[,3]),1] - df_fr1[which.min(df_fr1[,2]),1]) * freq
-  ph_fr2 = (df_fr2[which.min(df_fr2[,3]),1] - df_fr2[which.min(df_fr2[,2]),1]) * freq
-  ph_fr3 = (df_fr3[which.min(df_fr3[,3]),1] - df_fr3[which.min(df_fr3[,2]),1]) * freq
-  ph_fr4 = (df_fr4[which.min(df_fr4[,3]),1] - df_fr4[which.min(df_fr4[,2]),1]) * freq
+  ph_fr1 = (df_fr1[which.min(df_fr1[,2]),1] - df_fr1[which.min(df_fr1[,3]),1]) * freq
+  ph_fr2 = (df_fr2[which.min(df_fr2[,2]),1] - df_fr2[which.min(df_fr2[,3]),1]) * freq
+  ph_fr3 = (df_fr3[which.min(df_fr3[,2]),1] - df_fr3[which.min(df_fr3[,3]),1]) * freq
+  ph_fr4 = (df_fr4[which.min(df_fr4[,2]),1] - df_fr4[which.min(df_fr4[,3]),1]) * freq
 
   ph_m = mean(ph_fr1,ph_fr2,ph_fr3,ph_fr4)
   print(paste0("위상차 = ",ph_m," rad, radian frequency = ",freq))
@@ -159,6 +159,6 @@ data1 = read.table(pipe("pbpaste"), sep="\t", h=T) # 2023/11/10 sep="\t" 추가
 ```{r}
 #| label: freq(rad/s) - magnitude Graph - 2 그래프 그리기
 
-ggplot(data1, aes(freq,phaseDegree)) + geom_point() + geom_smooth()
+ggplot(data1, aes(freq,phaseDegree+30)) + geom_point() + geom_smooth() + scale_x_log10(breaks = c(0.1, 1, 10, 100), labels = c("0.1","1", "10", "100")) + ylab("Phase(deg)") + xlab("Frequency(rad/s)")
 ```
 
